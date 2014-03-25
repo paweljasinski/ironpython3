@@ -107,14 +107,13 @@ namespace IronPython.Compiler {
         KeywordNot = 97,
         KeywordOr = 98,
         KeywordPass = 99,
-        KeywordPrint = 100,
-        KeywordRaise = 101,
-        KeywordReturn = 102,
-        KeywordTry = 103,
-        KeywordWhile = 104,
-        KeywordYield = 105,
-        KeywordAs = 106,
-        KeywordWith = 107,
+        KeywordRaise = 100,
+        KeywordReturn = 101,
+        KeywordTry = 102,
+        KeywordWhile = 103,
+        KeywordYield = 104,
+        KeywordAs = 105,
+        KeywordWith = 106,
 
         // *** END GENERATED CODE ***
 
@@ -399,7 +398,6 @@ namespace IronPython.Compiler {
         private static readonly Token kwNotToken = new SymbolToken(TokenKind.KeywordNot, "not");
         private static readonly Token kwOrToken = new SymbolToken(TokenKind.KeywordOr, "or");
         private static readonly Token kwPassToken = new SymbolToken(TokenKind.KeywordPass, "pass");
-        private static readonly Token kwPrintToken = new SymbolToken(TokenKind.KeywordPrint, "print");
         private static readonly Token kwRaiseToken = new SymbolToken(TokenKind.KeywordRaise, "raise");
         private static readonly Token kwReturnToken = new SymbolToken(TokenKind.KeywordReturn, "return");
         private static readonly Token kwTryToken = new SymbolToken(TokenKind.KeywordTry, "try");
@@ -502,10 +500,6 @@ namespace IronPython.Compiler {
 
         public static Token KeywordPassToken {
             get { return kwPassToken; }
-        }
-
-        public static Token KeywordPrintToken {
-            get { return kwPrintToken; }
         }
 
         public static Token KeywordRaiseToken {
