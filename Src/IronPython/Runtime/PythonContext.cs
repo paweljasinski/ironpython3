@@ -1831,7 +1831,7 @@ namespace IronPython.Runtime {
 
             _builtins = new PythonModule(dict);
 
-            _modulesDict["__builtin__"] = _builtins;
+            _modulesDict["builtins"] = _builtins;
         }
 
         private Dictionary<string, Type> CreateBuiltinTable() {
@@ -1957,6 +1957,7 @@ namespace IronPython.Runtime {
             dict["executable"] = _initialExecutable;
             dict["prefix"] =  _initialPrefix;
             dict["exec_prefix"] = _initialPrefix;
+            dict["base_exec_prefix"] = _initialPrefix;
             SetVersionVariables(dict);
         }
 

@@ -50,9 +50,19 @@ namespace IronPython.Compiler.Ast {
 
         private PythonVariable _variable;
         private MSAst.ParameterExpression _parameter;
-
+        protected Expression _annotation;
         public Parameter(string name)
             : this(name, ParameterKind.Normal) {
+        }
+
+        //public Parameter(string name, Expression annotation) {
+        //    : this(name, ParameterKind.Normal, annotation);
+        //}
+
+        public Parameter(string name, ParameterKind kind, Expression annotation) {
+            _name = name;
+            _kind = kind;
+            _annotation = annotation;
         }
 
         public Parameter(string name, ParameterKind kind) {
@@ -72,6 +82,10 @@ namespace IronPython.Compiler.Ast {
             set { _defaultValue = value; }
         }
 
+        public Expression Annotation {
+            get { return _annotation; }
+            set { _annotation = value; }
+        }
         public bool IsList {
             get {
                 return _kind == ParameterKind.List;

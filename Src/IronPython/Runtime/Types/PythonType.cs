@@ -360,6 +360,11 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
             return type.GetBasesTuple();
         }
 
+        public static void register(CodeContext/*!*/ context, object subclass) {
+            // TODO: python3, kludge to supress error
+            // Console.WriteLine("register:" + abc);
+        }
+
         private PythonTuple GetBasesTuple() {
             object[] res = new object[BaseTypes.Count];
             IList<PythonType> bases = BaseTypes;
@@ -695,7 +700,7 @@ type(name, bases, dict) -> creates a new type instance with the given name, base
             if (IsSystemType) {
                 if (PythonTypeOps.IsRuntimeAssembly(UnderlyingSystemType.GetTypeInfo().Assembly) || IsPythonType) {
                     object module = Get__module__(context, this);
-                    if (!module.Equals("__builtin__")) {
+                    if (!module.Equals("builtins")) {
                         return string.Format("<type '{0}.{1}'>", module, Name);
                     }
                 }

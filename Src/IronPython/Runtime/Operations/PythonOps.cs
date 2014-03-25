@@ -2324,6 +2324,7 @@ namespace IronPython.Runtime.Operations {
         /// a Tuple, or a single value.  This case is handled by EC.CreateThrowable.
         /// </summary>
         public static Exception MakeException(CodeContext/*!*/ context, object type, object value, object traceback) {
+            // TODO: remove value and traceback, add cause
             Exception e = MakeExceptionWorker(context, type, value, traceback, false);
             e.RemoveFrameList();
             return e;

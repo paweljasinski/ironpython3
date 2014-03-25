@@ -87,6 +87,7 @@ namespace IronPython.Compiler {
             _printFunction = options.PrintFunction;
             _unicodeLiterals = options.UnicodeLiterals;
             _names = new Dictionary<object, NameToken>(128, new TokenEqualityComparer(this));
+            _printFunction = true;
         }
 
         /// <summary>

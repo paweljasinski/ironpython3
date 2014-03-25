@@ -1381,10 +1381,12 @@ namespace IronPython.Modules
             }
 
             internal override Statement Revert() {
-                ClassDefinition cd = new ClassDefinition(name, expr.RevertExprs(bases), RevertStmts(body));
-                if (decorator_list.Count != 0) 
-                    cd.Decorators = expr.RevertExprs(decorator_list);
-                return cd;
+                // ClassDefinition cd = new ClassDefinition(name, expr.RevertExprs(bases), RevertStmts(body));
+                // TODO: fix python3
+                //if (decorator_list.Count != 0)
+                //    cd.Decorators = expr.RevertExprs(decorator_list);
+                //return cd;
+                return null;
             }
 
             public string name {
@@ -2898,14 +2900,13 @@ namespace IronPython.Modules
                 : this() {
                 if (stmt.ExceptType != null)
                     _type = Convert(stmt.ExceptType);
-                if (stmt.Value != null)
-                    _inst = Convert(stmt.Value);
-                if (stmt.Traceback != null)
-                    _tback = Convert(stmt.Traceback);
+                // TODO: fix python3, add cause
             }
 
             internal override Statement Revert() {
-                return new RaiseStatement(expr.Revert(type), expr.Revert(inst), expr.Revert(tback));
+                // TODO: fix python3
+                // return new RaiseStatement(expr.Revert(type), expr.Revert(inst), expr.Revert(tback));
+                return null;
             }
 
             public expr type {

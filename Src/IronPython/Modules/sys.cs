@@ -67,6 +67,15 @@ namespace IronPython.Modules {
             return prefix;
         }
 
+        // base_exec_prefix, prefix  and executable are set by PythonContext and updated on each reload
+
+        public static readonly string base_prefix;
+
+        static SysModule() {
+            base_prefix = GetPrefix();
+            _prefix = base_prefix;
+        }
+
         /// <summary>
         /// Returns detailed call statistics.  Not implemented in IronPython and always returns None.
         /// </summary>
@@ -145,7 +154,7 @@ Handle an exception by displaying it with a traceback on sys.stderr._")]
             return PythonOps.GetExceptionInfo(context);
         }
 
-        // exec_prefix and executable are set by PythonContext and updated on each reload
+        // base_exec_prefix, exec_prefix and executable are set by PythonContext and updated on each reload
 
         public static void exit() {
             exit(null);
@@ -277,7 +286,12 @@ Handle an exception by displaying it with a traceback on sys.stderr._")]
         public const string platform = "silverlight";
 #endif
 
-        public static readonly string prefix = GetPrefix();
+        private static string _prefix;
+
+        public static string prefix {
+            get { return _prefix; }
+            set { _prefix = value; }
+        }
 
         // ps1 and ps2 are set by PythonContext and only on the initial load
 

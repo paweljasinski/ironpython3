@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -44,6 +45,11 @@ namespace IronPython.Compiler.Ast {
         private readonly string _name;
         private Statement _body;
         private readonly Expression[] _bases;
+        private Arg[] _args;
+        //private readonly what _keywords;
+        //private readonly what _startargs;
+        //private readonly what _kwargs;
+
         private IList<Expression> _decorators;
 
         private PythonVariable _variable;           // Variable corresponding to the class name
@@ -58,13 +64,22 @@ namespace IronPython.Compiler.Ast {
         private static MSAst.ParameterExpression _parentContextParam = Ast.Parameter(typeof(CodeContext), "$parentContext");
         private static MSAst.Expression _tupleExpression = MSAst.Expression.Call(AstMethods.GetClosureTupleFromContext, _parentContextParam);
 
-        public ClassDefinition(string name, Expression[] bases, Statement body) {
+        public ClassDefinition(string name, Arg[] args, Statement body) {
             ContractUtils.RequiresNotNull(body, "body");
-            ContractUtils.RequiresNotNullItems(bases, "bases");
+            ContractUtils.RequiresNotNullItems(args, "args");
 
             _name = name;
-            _bases = bases;
+            _args = args;
             _body = body;
+
+            var basesStage = new List<Expression>();
+            foreach (var arg in args) {
+                var argInfo = arg.GetArgumentInfo();
+                if (argInfo.IsSimple) {
+                    basesStage.Add(arg.Expression);
+                }
+            }
+            _bases = basesStage.ToArray();
         }
 
         public SourceLocation Header {

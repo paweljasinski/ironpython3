@@ -80,6 +80,12 @@ namespace IronPython.Runtime.Types {
 
         public static string __doc__ = "classobj(name, bases, dict)";
 
+        public static void register(CodeContext/*!*/ context, object subclass) {
+            // TODO: old class should never be used anyway, this is just a placeholder to supress errors
+            // Console.WriteLine("register in oldclass:" + abc);
+        }
+
+
         public static object __new__(CodeContext/*!*/ context, [NotNull]PythonType cls, string name, PythonTuple bases, PythonDictionary/*!*/ dict) {
             if (dict == null) {
                 throw PythonOps.TypeError("dict must be a dictionary");

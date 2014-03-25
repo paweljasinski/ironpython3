@@ -27,13 +27,12 @@ namespace IronPython.Compiler.Ast {
     using Ast = MSAst.Expression;
 
     public class RaiseStatement : Statement {
-        private readonly Expression _type, _value, _traceback;
+        private readonly Expression _type, _cause;
         private bool _inFinally;
 
-        public RaiseStatement(Expression exceptionType, Expression exceptionValue, Expression traceBack) {
-            _type = exceptionType;
-            _value = exceptionValue;
-            _traceback = traceBack;
+        public RaiseStatement(Expression exception, Expression cause) {
+            _type = exception;
+            _cause = cause;
         }
 
         [Obsolete("Type is obsolete due to direct inheritance from DLR Expression.  Use ExceptType instead")]
@@ -47,17 +46,13 @@ namespace IronPython.Compiler.Ast {
             }
         }
 
-        public Expression Value {
-            get { return _value; }
-        }
-
-        public Expression Traceback {
-            get { return _traceback; }
+        public Expression Cause {
+            get { return _cause; }
         }
 
         public override MSAst.Expression Reduce() {
             MSAst.Expression raiseExpression;
-            if (_type == null && _value == null && _traceback == null) {
+            if (_type == null) {
                 raiseExpression = Ast.Call(
                     AstMethods.MakeRethrownException,
                     Parent.LocalContext
@@ -74,8 +69,9 @@ namespace IronPython.Compiler.Ast {
                     AstMethods.MakeException,
                     Parent.LocalContext,
                     TransformOrConstantNull(_type, typeof(object)),
-                    TransformOrConstantNull(_value, typeof(object)),
-                    TransformOrConstantNull(_traceback, typeof(object))
+                    // TODO: python3
+                    TransformOrConstantNull(null, typeof(object)),
+                    TransformOrConstantNull(null, typeof(object))
                 );
             }
 
@@ -99,11 +95,8 @@ namespace IronPython.Compiler.Ast {
                 if (_type != null) {
                     _type.Walk(walker);
                 }
-                if (_value != null) {
-                    _value.Walk(walker);
-                }
-                if (_traceback != null) {
-                    _traceback.Walk(walker);
+                if (_cause != null) {
+                    _cause.Walk(walker);
                 }
             }
             walker.PostWalk(this);
