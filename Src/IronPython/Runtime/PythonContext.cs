@@ -1957,6 +1957,7 @@ namespace IronPython.Runtime {
             dict["executable"] = _initialExecutable;
             dict["prefix"] =  _initialPrefix;
             dict["exec_prefix"] = _initialPrefix;
+            dict["base_exec_prefix"] = _initialPrefix;
             SetVersionVariables(dict);
         }
 
