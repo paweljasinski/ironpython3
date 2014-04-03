@@ -1728,6 +1728,12 @@ namespace IronPython.Modules {
             }
         }
 
+        public static PythonType range {
+            get {
+                return DynamicHelpers.GetPythonTypeFromType(typeof(Range));
+            }
+        }
+
         public static string raw_input(CodeContext/*!*/ context) {
             return raw_input(context, null);
         }
@@ -2126,12 +2132,6 @@ namespace IronPython.Modules {
                 throw PythonOps.TypeError("vars() argument must have __dict__ attribute");
             }
             return value;
-        }
-
-        public static PythonType range {
-            get {
-                return DynamicHelpers.GetPythonTypeFromType(typeof(Range));
-            }
         }
 
         public static List zip(object s0, object s1) {
