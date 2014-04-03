@@ -954,7 +954,7 @@ namespace IronPython.Modules {
 
         public static PythonType @int {
             get {
-                return DynamicHelpers.GetPythonTypeFromType(typeof(int));
+                return TypeCache.BigInteger;
             }
         }
 
@@ -1057,6 +1057,10 @@ namespace IronPython.Modules {
                 throw PythonOps.TypeError("iter(v, w): v must be callable");
             }
             return new SentinelIterator(context, func, sentinel);
+        }
+
+        public static BigInteger len([NotNull]Range r) {
+            return r.__len__();
         }
 
         public static int len([NotNull]string/*!*/ str) {

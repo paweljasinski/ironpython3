@@ -244,7 +244,7 @@ def AssertNotIn(x, l):
     Assert(x not in l, "%s should not be in %s" % (x, l))
 
 def AssertIs(x, t):
-    Assert(x == t, "%s should have type %s, but got %s" % (x, t, type(x)))
+    Assert(x == t, "expected type %s, but got %s" % (t, x))
 
 class AssertReisesCtx():
     def __init__(self, ex):

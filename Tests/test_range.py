@@ -14,12 +14,17 @@
 #####################################################################################
 
 ##
-## Test range and xrange
+## Test range
 ##
-## * sbs_builtin\test_xrange covers many xrange corner cases
+## * sbs_builtin\test_xrange covers many range corner cases
 ##
 
 from iptest.assert_util import *
+
+import sys
+import clr
+from System import Int64
+
 
 def test_range():
     Assert(list(range(10)) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -41,13 +46,10 @@ def test_range():
     Assert(list(range(-20,-3,-2)) == [])
 
 def test_range_collections():
-    try:
-        Assert(range(0, 100, 2).count(10) == 1)
-        Assert(range(0, 100, 2).index(10) == 5)
-        Assert(range(0, 100, 2)[5] == 10)
-        Assert(str(range(0, 100, 2)[0:5]) == 'range(0, 10, 2)')
-    except Exception as e:
-        print(e)
+    Assert(range(0, 100, 2).count(10) == 1)
+    Assert(range(0, 100, 2).index(10) == 5)
+    Assert(range(0, 100, 2)[5] == 10)
+    Assert(str(range(0, 100, 2)[0:5]) == 'range(0, 10, 2)')
 
 def _range_eqv_range(r, o):
     Assert(len(r) == len(o))
@@ -60,10 +62,19 @@ def _range_eqv_range(r, o):
             Assert(r[1-i] == o[1-i])
 
 def test_range_corner_cases():
-    import sys
     x = range(0, sys.maxsize, sys.maxsize-1)
     AreEqual(x[0], 0)
     AreEqual(x[1], sys.maxsize-1)
+
+    x = range(0, Int64.MaxValue, Int64.MaxValue-1)
+    AreEqual(x[0], 0)
+    AreEqual(x[1], Int64.MaxValue-1)
+
+    self.assertEqual(len(range(0, Int64.MaxValue, Int64.MaxValue-1)), 2)
+
+    r = range(-Int64.MaxValue, Int64.MaxValue, 2)
+    self.assertEqual(len(r), Int64.MaxValue)
+
 
 def test_range_coverage():
     ## ToString
@@ -80,17 +91,29 @@ def test_range_coverage():
     AssertError(TypeError, lambda: range(4) + 4)
     AssertError(TypeError, lambda: range(4) * 4)
 
+def test_range_equal():
+     AreEqual(range(0, 3, 2), range(0, 4, 2))
+     AreEqual(range(0), range(1, -1, 1))
 
+
+# as soon as unittest ans stdlib/test are usable, the following tests can be retired
+
+# ugly hack to avoid changing assertions style from unittest to iptest
 import iptest.assert_util as self
 self.assertEqual = self.AreEqual
+self.assertNotEqual = self.AreNotEqual
 self.assertRaises = self.AssertError
 self.assertIs = self.AssertIs
 self.assertIn = self.AssertIn
 self.assertNotIn = self.AssertNotIn
 self.assertRaisesCtx = self.AssertReisesCtx
 
+# fake the maxsize value to stress ranges beyond int64
+sys.maxsize = 9223372036854775807
+
+
+
 def test_range_from_stdlib():
-    # as soon as unittest ans stdlib/test are usable, this test can be removed
     self.assertEqual(list(range(3)), [0, 1, 2])
     self.assertEqual(list(range(1, 5)), [1, 2, 3, 4])
     self.assertEqual(list(range(0)), [])
@@ -144,8 +167,7 @@ def test_invalid_invocation_from_stdlib():
     self.assertRaises(ValueError, range, 1, 2, 0)
 
     a = int(10 * sys.maxsize)
-    # to be fixed after int/long unification
-    # self.assertRaises(ValueError, range, a, a + 1, int(0))
+    self.assertRaises(ValueError, range, a, a + 1, int(0))
     self.assertRaises(TypeError, range, 1., 1., 1.)
     self.assertRaises(TypeError, range, 1e100, 1e101, 1e101)
     self.assertRaises(TypeError, range, 0, "spam")
@@ -163,8 +185,6 @@ def test_invalid_invocation_from_stdlib():
     self.assertRaises(TypeError, range, 0.0, 0, 1.0)
     self.assertRaises(TypeError, range, 0.0, 0.0, 1)
     self.assertRaises(TypeError, range, 0.0, 0.0, 1.0)
-
-
 
 def test_index_from_stdlib():
     u = range(2)
@@ -194,12 +214,11 @@ def test_index_from_stdlib():
     self.assertEqual(range(1, 10, 3).index(4), 1)
     self.assertEqual(range(1, -10, -3).index(-5), 2)
 
-    # TODO: after int/long unification
-    # self.assertEqual(range(10**20).index(1), 1)
-    # self.assertEqual(range(10**20).index(10**20 - 1), 10**20 - 1)
+    self.assertEqual(range(10**20).index(1), 1)
+    self.assertEqual(range(10**20).index(10**20 - 1), 10**20 - 1)
 
-    # self.assertRaises(ValueError, range(1, 2**100, 2).index, 2**87)
-    # self.assertEqual(range(1, 2**100, 2).index(2**87+1), 2**86)
+    self.assertRaises(ValueError, range(1, 2**100, 2).index, 2**87)
+    self.assertEqual(range(1, 2**100, 2).index(2**87+1), 2**86)
 
     class AlwaysEqual(object):
         def __eq__(self, other):
@@ -214,15 +233,14 @@ def test_count_from_stdlib():
     self.assertEqual(range(3).count(1), 1)
     self.assertEqual(range(3).count(2), 1)
     self.assertEqual(range(3).count(3), 0)
-    self.assertIs(type(range(3).count(-1)), int)
-    self.assertIs(type(range(3).count(1)), int)
     # TODO: after int/long unification
-    # self.assertEqual(range(10**20).count(1), 1)
-    # self.assertEqual(range(10**20).count(10**20), 0)
+    # self.assertIs(type(range(3).count(-1)), int)
+    # self.assertIs(type(range(3).count(1)), int)
+    self.assertEqual(range(10**20).count(1), 1)
+    self.assertEqual(range(10**20).count(10**20), 0)
     self.assertEqual(range(3).index(1), 1)
-    # TODO: after int/long unification
-    # self.assertEqual(range(1, 2**100, 2).count(2**87), 0)
-    # self.assertEqual(range(1, 2**100, 2).count(2**87+1), 1)
+    self.assertEqual(range(1, 2**100, 2).count(2**87), 0)
+    self.assertEqual(range(1, 2**100, 2).count(2**87+1), 1)
 
     class AlwaysEqual(object):
         def __eq__(self, other):
@@ -230,8 +248,7 @@ def test_count_from_stdlib():
     always_equal = AlwaysEqual()
     self.assertEqual(range(10).count(always_equal), 10)
 
-    # TODO: after int/long unification
-    # self.assertEqual(len(range(sys.maxsize, sys.maxsize+10)), 10)
+    self.assertEqual(len(range(sys.maxsize, sys.maxsize+10)), 10)
 
 def test_user_index_method_from_stdlib():
     bignum = 2*sys.maxsize
@@ -243,8 +260,7 @@ def test_user_index_method_from_stdlib():
             self.n = int(n)
         def __index__(self):
             return self.n
-    # TODO: after int/long unification
-    #self.assertEqual(list(range(I(bignum), I(bignum + 1))), [bignum])
+    self.assertEqual(list(range(I(bignum), I(bignum + 1))), [bignum])
     self.assertEqual(list(range(I(smallnum), I(smallnum + 1))), [smallnum])
 
     # User-defined class with a failing __index__ method
@@ -402,8 +418,7 @@ def test_slice_from_stdlib():
                 range(0),
                 range(1, 9, 3),
                 range(8, 0, -3),
-    # TODO: after int/long unification
-#                range(sys.maxsize+1, sys.maxsize+10),
+                range(sys.maxsize+1, sys.maxsize+10),
                 ]:
         check(0, 2)
         check(0, 20)
@@ -453,8 +468,7 @@ def test_reverse_iteration_from_stdlib():
                 range(0),
                 range(1, 9, 3),
                 range(8, 0, -3),
-    # TODO: after int/long unification
-#                range(sys.maxsize+1, sys.maxsize+10),
+                range(sys.maxsize+1, sys.maxsize+10),
                 ]:
         self.assertEqual(list(reversed(r)), list(r)[::-1])
 
@@ -479,6 +493,7 @@ def test_comparison_from_stdlib():
     # tuples for each pair from the test lists above.
     ranges_eq = [a == b for a in test_ranges for b in test_ranges]
     tuples_eq = [a == b for a in test_tuples for b in test_tuples]
+
     self.assertEqual(ranges_eq, tuples_eq)
 
     # Check that != correctly gives the logical negation of ==
@@ -496,20 +511,19 @@ def test_comparison_from_stdlib():
     self.assertIs(() == range(0), False)
     self.assertIs(range(2) == [0, 1], False)
 
-    # TODO: fix after int/long merge
     # Huge integers aren't a problem.
-    #self.assertEqual(range(0, 2**100 - 1, 2),
-    #                    range(0, 2**100, 2))
-    #self.assertEqual(hash(range(0, 2**100 - 1, 2)),
-    #                    hash(range(0, 2**100, 2)))
-    #self.assertNotEqual(range(0, 2**100, 2),
-    #                    range(0, 2**100 + 1, 2))
-    #self.assertEqual(range(2**200, 2**201 - 2**99, 2**100),
-    #                    range(2**200, 2**201, 2**100))
-    #self.assertEqual(hash(range(2**200, 2**201 - 2**99, 2**100)),
-    #                    hash(range(2**200, 2**201, 2**100)))
-    #self.assertNotEqual(range(2**200, 2**201, 2**100),
-    #                    range(2**200, 2**201 + 1, 2**100))
+    self.assertEqual(range(0, 2**100 - 1, 2),
+                        range(0, 2**100, 2))
+    self.assertEqual(hash(range(0, 2**100 - 1, 2)),
+                        hash(range(0, 2**100, 2)))
+    self.assertNotEqual(range(0, 2**100, 2),
+                        range(0, 2**100 + 1, 2))
+    self.assertEqual(range(2**200, 2**201 - 2**99, 2**100),
+                        range(2**200, 2**201, 2**100))
+    self.assertEqual(hash(range(2**200, 2**201 - 2**99, 2**100)),
+                        hash(range(2**200, 2**201, 2**100)))
+    self.assertNotEqual(range(2**200, 2**201, 2**100),
+                        range(2**200, 2**201 + 1, 2**100))
 
     # Order comparisons are not implemented for ranges.
     with self.assertRaisesCtx(TypeError):

@@ -475,7 +475,7 @@ namespace IronPython.Runtime {
         public static object fromkeys(CodeContext context, PythonType cls, object seq, object value) {
             Range xr = seq as Range;
             if (xr != null) {
-                int n = xr.__len__();
+                int n = (int)xr.__len__();
                 object ret = PythonContext.GetContext(context).CallSplat(cls);
                 if (ret.GetType() == typeof(PythonDictionary)) {
                     PythonDictionary dr = ret as PythonDictionary;
